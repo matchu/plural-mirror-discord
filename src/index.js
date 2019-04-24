@@ -53,9 +53,8 @@ async function main() {
         } else {
             console.error(
                 `⛔️  We can't access the mirror server (${mirrorServerId})! ` +
-                    `PluralMirror won't be able to perform any of its actual ` +
-                    `mirroring functionality. Please make sure you've invited ` +
-                    `the bot! (This could also be a network outage? 🤔)`
+                    `Please make sure you've invited the bot! (This could ` +
+                    `also be a network outage? 🤔)`
             );
         }
 
@@ -72,6 +71,11 @@ async function main() {
         }
         if (sourceServers.length === 0) {
             console.warn("⚠️  No source servers found.");
+        }
+
+        if (!mirrorServer) {
+            console.error("⛔️  Aborting because mirror server is missing 😓");
+            process.exit(1);
         }
 
         console.log("💞  hii I love you! 😍");

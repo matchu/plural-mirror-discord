@@ -11,14 +11,23 @@ function buildMessageHandler(serverSet, identities, restart) {
                 // removes a class of bug and reduces log noise!
                 return;
             } else if (server.isMirrorServer) {
-                await handleMessageFromMirrorServer(
-                    message,
-                    serverSet,
-                    identities,
-                    restart
-                );
+                try {
+                    await handleMessageFromMirrorServer(
+                        message,
+                        serverSet,
+                        identities,
+                        restart
+                    );
+                } catch (e) {
+                    // Notify the user of the error, then bubble up to the
+                    // main error handler. (We only do this for the mirror
+                    // server, to avoid disrupting people on the source
+                    // server!)
+                    message.reply("⛔️ " + e);
+                    throw e;
+                }
             } else if (server.isSourceServer) {
-                console.log("😴  TODO: Handle message from source server");
+                await handleMessageFromSourceServer(message, serverSet);
             } else {
                 console.warn(
                     `⚠️  Received message from unexpected server ${
@@ -27,9 +36,7 @@ function buildMessageHandler(serverSet, identities, restart) {
                 );
             }
         } catch (e) {
-            console.error(`⛔️  Error sending message.`, e);
-            message.react("⛔");
-            message.reply("⛔️ " + e);
+            console.error(`⛔️  Error handling message.`, e);
         }
     };
 }
@@ -48,7 +55,7 @@ async function handleMessageFromMirrorServer(
     }
 
     const mirrorChannel = message.channel;
-    const channelToSendTo = serverSet.getSourceChannelFor(mirrorChannel);
+    const sourceChannel = serverSet.getSourceChannelFor(mirrorChannel);
 
     const parsedMessage = parseMessageContentFromMirrorServer(
         message.content,
@@ -65,14 +72,37 @@ async function handleMessageFromMirrorServer(
     const { body, identity } = parsedMessage;
 
     console.log(
-        `✉️  [${channelToSendTo.guild.name} #${channelToSendTo.name}] ${
+        `✉️  [${sourceChannel.guild.name} #${sourceChannel.name}] ${
             identity.name
-        }: ${body}.`
+        }: ${body}`
     );
 
-    await sendMessageAsSomeone(body, channelToSendTo, identity);
+    await sendMessageAsSomeone(body, sourceChannel, identity);
 
     message.react("✅");
+}
+
+async function handleMessageFromSourceServer(message, serverSet) {
+    const sourceChannel = message.channel;
+    const mirrorChannel = serverSet.getMirrorChannelFor(sourceChannel);
+
+    const body = message.content;
+    const authorImpersonator = {
+        name: message.author.username,
+        avatarUrl: message.author.avatarURL,
+    };
+
+    console.log(
+        `📬  [${sourceChannel.guild.name} #${sourceChannel.name}] ${
+            authorImpersonator.name
+        }: ${body}`
+    );
+
+    await sendMessageAsSomeone(
+        message.content,
+        mirrorChannel,
+        authorImpersonator
+    );
 }
 
 function parseMessageContentFromMirrorServer(content, identities) {

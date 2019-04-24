@@ -2,6 +2,9 @@ class ServerSet {
     constructor(mirrorServer, sourceServers, channelPairs) {
         this.mirrorServer = mirrorServer;
         this.sourceServers = sourceServers;
+        if (!mirrorServer) {
+            return;
+        }
 
         const allServers = [mirrorServer, ...sourceServers];
         this._allServersById = new Map(allServers.map(s => [s.guild.id, s]));
@@ -9,10 +12,18 @@ class ServerSet {
         this._sourceChannelsByMirrorChannelId = new Map(
             channelPairs.map(cp => [cp.mirrorChannel.id, cp.sourceChannel])
         );
+
+        this._mirrorChannelsBySourceChannelId = new Map(
+            channelPairs.map(cp => [cp.sourceChannel.id, cp.mirrorChannel])
+        );
     }
 
     getServerById(serverId) {
         return this._allServersById.get(serverId);
+    }
+
+    getMirrorChannelFor(sourceChannel) {
+        return this._mirrorChannelsBySourceChannelId.get(sourceChannel.id);
     }
 
     getSourceChannelFor(mirrorChannel) {
