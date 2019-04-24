@@ -1,21 +1,21 @@
 const sendMessageAsIdentity = require("./send-message-as-identity");
 
-function buildMessageHandler(
-    message,
-    mirrorServer,
-    sourceServers,
-    identities
-) {
+function buildMessageHandler(mirrorServer, sourceServers, identities) {
     const allServers = [mirrorServer, ...sourceServers];
     const allServersById = new Map(allServers.map(s => [s.guild.id, s]));
 
     return message => {
         const server = allServersById.get(message.guild.id);
 
-        if (server.isMirrorServer) {
+        if (message.author.bot) {
+            // Ignore bot messages, especially our own. We don't expect our
+            // messages to, like, start with shortcodes or anything... but it
+            // removes a class of bug and reduces log noise!
+            return;
+        } else if (server.isMirrorServer) {
             handleMessageFromMirrorServer(message, sourceServers, identities);
         } else if (server.isSourceServer) {
-            console.log("message from source server");
+            console.log("😴  TODO: Handle message from source server");
         } else {
             console.warn(
                 `⚠️  Received message from unexpected server ${
@@ -26,7 +26,11 @@ function buildMessageHandler(
     };
 }
 
-function handleMessageFromMirrorServer(message, sourceServers, identities) {
+async function handleMessageFromMirrorServer(
+    message,
+    sourceServers,
+    identities
+) {
     // Simple for now! Let's just always forward to the first source's
     // #general.
     const serverToSendTo = sourceServers[0];
@@ -50,7 +54,17 @@ function handleMessageFromMirrorServer(message, sourceServers, identities) {
             identity.name
         }: ${body}.`
     );
-    sendMessageAsIdentity(body, channelToSendTo, identity);
+
+    try {
+        await sendMessageAsIdentity(body, channelToSendTo, identity);
+    } catch (e) {
+        console.error(`⛔️  Error sending message.`, e);
+        message.react("⛔");
+        message.reply("⛔️ " + e);
+        return;
+    }
+
+    message.react("✅");
 }
 
 function parseMessageContentFromMirrorServer(content, identities) {

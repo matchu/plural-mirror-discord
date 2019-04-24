@@ -58,7 +58,7 @@ client.on("ready", () => {
 
     client.on(
         "message",
-        buildMessageHandler(client, mirrorServer, sourceServers, identities)
+        buildMessageHandler(mirrorServer, sourceServers, identities)
     );
 });
 

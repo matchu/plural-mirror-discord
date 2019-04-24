@@ -19,6 +19,7 @@ const identityShortcodes = Object.keys(process.env)
 const identities = identityShortcodes.map(shortcode => ({
     shortcode,
     name: process.env[`pm.identities.${shortcode}.name`],
+    avatarUrl: process.env[`pm.identities.${shortcode}.avatar_url`],
 }));
 
 module.exports = {
