@@ -3,7 +3,7 @@ const sendMessageAsIdentity = require("./send-message-as-identity");
 function buildMessageHandler(serverSet, identities) {
     return async message => {
         try {
-            const server = serverSet.getById(message.guild.id);
+            const server = serverSet.getServerById(message.guild.id);
 
             if (message.author.bot) {
                 // Ignore bot messages, especially our own. We don't expect our
@@ -34,10 +34,8 @@ function buildMessageHandler(serverSet, identities) {
 }
 
 async function handleMessageFromMirrorServer(message, serverSet, identities) {
-    // Simple for now! Let's just always forward to the first source's
-    // #general.
-    const serverToSendTo = serverSet.sourceServers[0];
-    const channelToSendTo = serverToSendTo.guild.defaultChannel;
+    const mirrorChannel = message.channel;
+    const channelToSendTo = serverSet.getSourceChannelFor(mirrorChannel);
 
     const parsedMessage = parseMessageContentFromMirrorServer(
         message.content,

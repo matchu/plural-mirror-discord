@@ -11,20 +11,30 @@ const buildMessageHandler = require("./handle-message");
 
 const client = new Discord.Client();
 
-client.on("ready", () => {
+client.on("ready", async () => {
     console.log(`✅  Logged in as ${client.user.tag}!`);
 
-    const inviteUrl =
+    const mirrorInviteUrl =
+        "https://discordapp.com/api/oauth2/authorize?client_id=" +
+        client.user.id +
+        "&permissions=536874064&scope=bot";
+    const sourceInviteUrl =
         "https://discordapp.com/api/oauth2/authorize?client_id=" +
         client.user.id +
         "&permissions=536874048&scope=bot";
-    console.log(`💌  Invite: ${inviteUrl}`);
+    console.log(`💌  Invite to mirror server: ${mirrorInviteUrl}`);
+    console.log(`💌  Invite to source server: ${sourceInviteUrl}`);
 
-    const { serverSet, missingSourceServers } = initializeServers(
-        client,
-        mirrorServerId,
-        sourceServerConfigs
-    );
+    let serverSet, missingSourceServers;
+    try {
+        ({ serverSet, missingSourceServers } = await initializeServers(
+            client,
+            mirrorServerId,
+            sourceServerConfigs
+        ));
+    } catch (e) {
+        console.error("⛔️  Error during initialization", e);
+    }
 
     const { mirrorServer, sourceServers } = serverSet;
 
