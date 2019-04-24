@@ -1,5 +1,11 @@
 const sendMessageWithCustomAuthor = require("./send-message-with-custom-author");
 
+/**
+ * Ooh, the behavioral meat of the bot! The message handler function!
+ *
+ * This function handles all messages the bot can see, and dispatches them to
+ * special handlers for messages from the mirror server vs source servers.
+ */
 async function handleMessage(message, serverSet, identities, restart) {
     try {
         const server = serverSet.getServerById(message.guild.id);
@@ -18,10 +24,10 @@ async function handleMessage(message, serverSet, identities, restart) {
                     restart
                 );
             } catch (e) {
-                // Notify the user of the error, then bubble up to the
-                // main error handler. (We only do this for the mirror
-                // server, to avoid disrupting people on the source
-                // server!)
+                // On the mirror server, in addition to our normal error
+                // handling, we print a special error message to the user.
+                // (We don't do this on source servers, because yikes it would
+                // be noisy if we had a bug yelling about every message!)
                 message.reply("⛔️ " + e);
                 throw e;
             }
@@ -39,18 +45,25 @@ async function handleMessage(message, serverSet, identities, restart) {
     }
 }
 
+/**
+ * Handle a message from the mirror server. This is probably a message for us
+ * to forward as a specific identity, but it could also be a special command.
+ */
 async function handleMessageFromMirrorServer(
     message,
     serverSet,
     identities,
     restart
 ) {
+    // "ping" command to help test the bot is online!
     if (message.content === "ping") {
         console.log("⭐️  Ping!");
         message.reply("Pong! 💖");
         return;
     }
 
+    // "restart" command to help us re-initialize, e.g. if our channels or
+    // server invites have updated!
     if (message.content === "restart") {
         console.log("❗️  Restarting!");
         await message.reply("❗️  Restarting!");
@@ -58,10 +71,15 @@ async function handleMessageFromMirrorServer(
         return;
     }
 
+    // Otherwise, this is a message for us to forward. Let's learn where we're
+    // forwarding it to.
     const mirrorChannel = message.channel;
     const sourceChannel = serverSet.getSourceChannelFor(mirrorChannel);
 
-    const parsedMessage = parseMessageContentFromMirrorServer(
+    // Next, let's try to parse the message, by separating the identity prefix
+    // from the message body. (If this doesn't work, this is probably a
+    // mis-formatted message, abort the handler!)
+    const parsedMessage = parseMessageAsIdentityAndBody(
         message.content,
         identities
     );
@@ -81,14 +99,18 @@ async function handleMessageFromMirrorServer(
         }: ${body}`
     );
 
+    // Okay, cool! Let's forward the message, and let the user know we did.
     await sendMessageWithCustomAuthor(body, sourceChannel, {
         username: identity.name,
         avatarURL: identity.avatarURL,
     });
-
     message.react("✅");
 }
 
+/**
+ * Handle a message from the source server. This is always pretty simple: just
+ * forward the message to the corresponding mirror channel.
+ */
 async function handleMessageFromSourceServer(message, serverSet) {
     const sourceChannel = message.channel;
     const mirrorChannel = serverSet.getMirrorChannelFor(sourceChannel);
@@ -107,7 +129,15 @@ async function handleMessageFromSourceServer(message, serverSet) {
     });
 }
 
-function parseMessageContentFromMirrorServer(content, identities) {
+/**
+ * Attempt to parse a message as an identity shortcode followed by the message
+ * body. For example, a message like "e hi" could be an attempt to send the
+ * message "hi" as the identity with shortcode "e" from the mirror server.
+ *
+ * Return null if the message string doesn't match this format, or if the first
+ * word in the message doesn't match any of our identity shortcodes.
+ */
+function parseMessageAsIdentityAndBody(content, identities) {
     const match = content.match(/(.+?) (.+)/);
     if (!match) {
         return null;
