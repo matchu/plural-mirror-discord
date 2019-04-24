@@ -7,7 +7,7 @@ const {
     identities,
 } = require("./config");
 const initializeServers = require("./initialize-servers");
-const buildMessageHandler = require("./handle-message");
+const handleMessage = require("./handle-message");
 
 function main(restart) {
     const client = new Discord.Client();
@@ -103,7 +103,7 @@ function main(restart) {
         // Okay, let's start listening for messages! In addition to the message
         // itself, we provide server information, our headmate identities, and
         // a callback for the "restart" command. See `handle-message.js`!
-        client.on("message", () =>
+        client.on("message", message =>
             handleMessage(message, serverSet, identities, () =>
                 restart(client)
             )

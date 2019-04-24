@@ -1,4 +1,4 @@
-const sendMessageAsSomeone = require("./send-message-as-someone");
+const sendMessageWithCustomAuthor = require("./send-message-with-custom-author");
 
 async function handleMessage(message, serverSet, identities, restart) {
     try {
@@ -81,7 +81,10 @@ async function handleMessageFromMirrorServer(
         }: ${body}`
     );
 
-    await sendMessageAsSomeone(body, sourceChannel, identity);
+    await sendMessageWithCustomAuthor(body, sourceChannel, {
+        username: identity.name,
+        avatarURL: identity.avatarURL,
+    });
 
     message.react("✅");
 }
@@ -91,22 +94,17 @@ async function handleMessageFromSourceServer(message, serverSet) {
     const mirrorChannel = serverSet.getMirrorChannelFor(sourceChannel);
 
     const body = message.content;
-    const authorImpersonator = {
-        name: message.author.username,
-        avatarUrl: message.author.avatarURL,
-    };
 
     console.log(
         `📬  [${sourceChannel.guild.name} #${sourceChannel.name}] ${
-            authorImpersonator.name
+            message.author.username
         }: ${body}`
     );
 
-    await sendMessageAsSomeone(
-        message.content,
-        mirrorChannel,
-        authorImpersonator
-    );
+    await sendMessageWithCustomAuthor(message.content, mirrorChannel, {
+        username: message.author.username,
+        avatarURL: message.author.avatarURL,
+    });
 }
 
 function parseMessageContentFromMirrorServer(content, identities) {
