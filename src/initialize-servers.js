@@ -194,6 +194,17 @@ class ServerSet {
     getSourceChannelFor(mirrorChannel) {
         return this._sourceChannelsByMirrorChannelId.get(mirrorChannel.id);
     }
+
+    /**
+     * Given a mirror or source channel, return its corresponding source or
+     * mirror channel, respectively.
+     */
+    getPairedChannelFor(channel) {
+        return (
+            this.getMirrorChannelFor(channel) ||
+            this.getSourceChannelFor(channel)
+        );
+    }
 }
 
 module.exports = initializeServers;
