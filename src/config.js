@@ -1,5 +1,6 @@
 /**
- * This application is configured via environment variables.
+ * This application is configured via environment variables. In this module, we
+ * load and export them for easy use elsewhere!
  *
  * Locally, you can use a `.env` file to specify these values - or, if you
  * deploy to a service like Heroku, you can specify them in your application's
