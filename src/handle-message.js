@@ -1,4 +1,4 @@
-const sendMessageAsIdentity = require("./send-message-as-identity");
+const sendMessageAsSomeone = require("./send-message-as-someone");
 
 function buildMessageHandler(serverSet, identities, restart) {
     return async message => {
@@ -70,7 +70,7 @@ async function handleMessageFromMirrorServer(
         }: ${body}.`
     );
 
-    await sendMessageAsIdentity(body, channelToSendTo, identity);
+    await sendMessageAsSomeone(body, channelToSendTo, identity);
 
     message.react("✅");
 }

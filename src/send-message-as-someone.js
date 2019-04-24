@@ -1,6 +1,17 @@
-// TODO: I'm using a specialized message here, to match my personal brand,
+// TODO: I'm using a specialized string here, to match my personal brand,
 //       since it's public-facing-ish. This should probably be configured!
 const WEBHOOK_NAME = "MoreMatchus Message Proxy";
+
+async function sendMessageAsSomeone(content, channelToSendTo, someone) {
+    // Webhooks are the key to this whole bot! Normally, your bot speaks with
+    // its fixed name and avatar - but webhook messages can be configured to
+    // show arbitrary names, avatars, etc. :)
+    const webhook = await connectToWebhook(channelToSendTo);
+    webhook.send(content, {
+        username: someone.name,
+        avatarURL: someone.avatarUrl,
+    });
+}
 
 async function connectToWebhook(channel) {
     // First, look for an existing webhook.
@@ -22,4 +33,4 @@ async function connectToWebhook(channel) {
     return newWebhook;
 }
 
-module.exports = connectToWebhook;
+module.exports = sendMessageAsSomeone;
