@@ -20,11 +20,13 @@ client.on("ready", () => {
         "&permissions=536874048&scope=bot";
     console.log(`💌  Invite: ${inviteUrl}`);
 
-    const {
-        mirrorServer,
-        sourceServers,
-        missingSourceServers,
-    } = initializeServers(client, mirrorServerId, sourceServerConfigs);
+    const { serverSet, missingSourceServers } = initializeServers(
+        client,
+        mirrorServerId,
+        sourceServerConfigs
+    );
+
+    const { mirrorServer, sourceServers } = serverSet;
 
     if (mirrorServer) {
         console.log(
@@ -56,10 +58,7 @@ client.on("ready", () => {
 
     console.log("💞  hii I love you! 😍");
 
-    client.on(
-        "message",
-        buildMessageHandler(mirrorServer, sourceServers, identities)
-    );
+    client.on("message", buildMessageHandler(serverSet, identities));
 });
 
 client.login(clientToken);

@@ -1,39 +1,42 @@
 const sendMessageAsIdentity = require("./send-message-as-identity");
 
-function buildMessageHandler(mirrorServer, sourceServers, identities) {
-    const allServers = [mirrorServer, ...sourceServers];
-    const allServersById = new Map(allServers.map(s => [s.guild.id, s]));
+function buildMessageHandler(serverSet, identities) {
+    return async message => {
+        try {
+            const server = serverSet.getById(message.guild.id);
 
-    return message => {
-        const server = allServersById.get(message.guild.id);
-
-        if (message.author.bot) {
-            // Ignore bot messages, especially our own. We don't expect our
-            // messages to, like, start with shortcodes or anything... but it
-            // removes a class of bug and reduces log noise!
-            return;
-        } else if (server.isMirrorServer) {
-            handleMessageFromMirrorServer(message, sourceServers, identities);
-        } else if (server.isSourceServer) {
-            console.log("😴  TODO: Handle message from source server");
-        } else {
-            console.warn(
-                `⚠️  Received message from unexpected server ${
-                    message.guild.name
-                }.`
-            );
+            if (message.author.bot) {
+                // Ignore bot messages, especially our own. We don't expect our
+                // messages to, like, start with shortcodes or anything... but it
+                // removes a class of bug and reduces log noise!
+                return;
+            } else if (server.isMirrorServer) {
+                await handleMessageFromMirrorServer(
+                    message,
+                    serverSet,
+                    identities
+                );
+            } else if (server.isSourceServer) {
+                console.log("😴  TODO: Handle message from source server");
+            } else {
+                console.warn(
+                    `⚠️  Received message from unexpected server ${
+                        message.guild.name
+                    }.`
+                );
+            }
+        } catch (e) {
+            console.error(`⛔️  Error sending message.`, e);
+            message.react("⛔");
+            message.reply("⛔️ " + e);
         }
     };
 }
 
-async function handleMessageFromMirrorServer(
-    message,
-    sourceServers,
-    identities
-) {
+async function handleMessageFromMirrorServer(message, serverSet, identities) {
     // Simple for now! Let's just always forward to the first source's
     // #general.
-    const serverToSendTo = sourceServers[0];
+    const serverToSendTo = serverSet.sourceServers[0];
     const channelToSendTo = serverToSendTo.guild.defaultChannel;
 
     const parsedMessage = parseMessageContentFromMirrorServer(
@@ -55,14 +58,7 @@ async function handleMessageFromMirrorServer(
         }: ${body}.`
     );
 
-    try {
-        await sendMessageAsIdentity(body, channelToSendTo, identity);
-    } catch (e) {
-        console.error(`⛔️  Error sending message.`, e);
-        message.react("⛔");
-        message.reply("⛔️ " + e);
-        return;
-    }
+    await sendMessageAsIdentity(body, channelToSendTo, identity);
 
     message.react("✅");
 }
