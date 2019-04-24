@@ -8,6 +8,7 @@ const {
 } = require("./config");
 const initializeServers = require("./initialize-servers");
 const handleMessage = require("./handle-message");
+const { handleTypingStart, handleTypingStop } = require("./handle-typing");
 
 function main(restart) {
     const client = new Discord.Client();
@@ -107,6 +108,16 @@ function main(restart) {
             handleMessage(message, serverSet, identities, () =>
                 restart(client)
             )
+        );
+
+        // Additionally, listen for typing events, to forward back and forth
+        // between our mirror and source servers. It's very coarse-grained, but
+        // hopefully enough to give people a sense of what's going on :)
+        client.on("typingStart", (channel, user) =>
+            handleTypingStart(channel, user, serverSet)
+        );
+        client.on("typingStop", (channel, user) =>
+            handleTypingStop(channel, user, serverSet)
         );
     });
 
