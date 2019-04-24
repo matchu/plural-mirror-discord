@@ -58,7 +58,7 @@ async function initializeServers(client, mirrorServerId, sourceServerConfigs) {
                     continue;
                 }
 
-                const mirrorChannel = await findOrCreateMirrorChannel(
+                const mirrorChannel = await connectToMirrorChannel(
                     sourceChannel,
                     sourceServer,
                     mirrorServer
@@ -89,6 +89,30 @@ function connectToSourceServer(client, shortcode, serverId) {
     }
 
     return { shortcode, guild, isSourceServer: true };
+}
+
+async function connectToMirrorChannel(
+    sourceChannel,
+    sourceServer,
+    mirrorServer
+) {
+    const mirrorChannel = await findOrCreateMirrorChannel(
+        sourceChannel,
+        sourceServer,
+        mirrorServer
+    );
+
+    // Set the mirror channel's topic to the source channel's URL, to make it
+    // easy to get back after saying something!
+    const sourceChannelUrl = `https://discordapp.com/channels/${
+        sourceServer.guild.id
+    }/${sourceChannel.id}`;
+    mirrorChannel.setTopic(
+        `🔙❓  ${sourceChannelUrl}`,
+        "Automatic topic change for convenient link back to source channel"
+    );
+
+    return mirrorChannel;
 }
 
 async function findOrCreateMirrorChannel(
