@@ -71,14 +71,9 @@ async function handleMessageFromMirrorServer(
         return;
     }
 
-    // Otherwise, this is a message for us to forward. Let's learn where we're
-    // forwarding it to.
-    const mirrorChannel = message.channel;
-    const sourceChannel = serverSet.getSourceChannelFor(mirrorChannel);
-
-    // Next, let's try to parse the message, by separating the identity prefix
-    // from the message body. (If this doesn't work, this is probably a
-    // mis-formatted message, abort the handler!)
+    // Otherwise, let's try to parse this as a message to forward, by reading
+    // the identity prefix from the message body. (If this doesn't work, this
+    // is probably a mis-formatted message, abort the handler!)
     const parsedMessage = parseMessageAsIdentityAndBody(
         message.content,
         identities
@@ -92,6 +87,23 @@ async function handleMessageFromMirrorServer(
     }
 
     const { body, identity } = parsedMessage;
+
+    // Additionally, let's figure out where this message should go.
+    const mirrorChannel = message.channel;
+    const sourceChannel = serverSet.getSourceChannelFor(mirrorChannel);
+    if (!sourceChannel) {
+        console.warn(
+            `⚠️  Got a forwardable message in #${mirrorChannel.name}, but ` +
+                `couldn't find a matching source channel. "${body}"`
+        );
+        message.reply(
+            `⚠️  This channel isn't connected to a source server, so I ` +
+                `can't forward this message. Is that what you were trying ` +
+                `to do? If so, double-check that we were able to connect to ` +
+                `the desired source server, and that the channel exists.`
+        );
+        return;
+    }
 
     console.log(
         `✉️  [${sourceChannel.guild.name} #${sourceChannel.name}] ${
