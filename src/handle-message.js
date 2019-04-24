@@ -1,6 +1,6 @@
 const sendMessageAsIdentity = require("./send-message-as-identity");
 
-function buildMessageHandler(serverSet, identities) {
+function buildMessageHandler(serverSet, identities, restart) {
     return async message => {
         try {
             const server = serverSet.getServerById(message.guild.id);
@@ -14,7 +14,8 @@ function buildMessageHandler(serverSet, identities) {
                 await handleMessageFromMirrorServer(
                     message,
                     serverSet,
-                    identities
+                    identities,
+                    restart
                 );
             } else if (server.isSourceServer) {
                 console.log("😴  TODO: Handle message from source server");
@@ -33,7 +34,19 @@ function buildMessageHandler(serverSet, identities) {
     };
 }
 
-async function handleMessageFromMirrorServer(message, serverSet, identities) {
+async function handleMessageFromMirrorServer(
+    message,
+    serverSet,
+    identities,
+    restart
+) {
+    if (message.content === "restart") {
+        console.log("❗️  Restarting!");
+        await message.reply("❗️  Restarting!");
+        restart();
+        return;
+    }
+
     const mirrorChannel = message.channel;
     const channelToSendTo = serverSet.getSourceChannelFor(mirrorChannel);
 
@@ -45,6 +58,7 @@ async function handleMessageFromMirrorServer(message, serverSet, identities) {
         console.warn(
             `⚠️  Message from mirror server did not start with an identity shortcode.`
         );
+        message.reply(`⚠️  Didn't understand that message 😓`);
         return;
     }
 
