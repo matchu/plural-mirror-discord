@@ -1,12 +1,12 @@
 {
     "name": "plural-mirror-discord",
     "version": "1.0.0",
-    "main": "index.js",
+    "main": "src/index.js",
     "author": "Matchu",
     "license": "MIT",
     "private": true,
     "scripts": {
-        "start": "node -r dotenv/config index.js"
+        "start": "node -r dotenv/config src/index.js"
     },
     "dependencies": {
         "discord.js": "^11.4.2",
