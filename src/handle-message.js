@@ -1,44 +1,42 @@
 const sendMessageAsSomeone = require("./send-message-as-someone");
 
-function buildMessageHandler(serverSet, identities, restart) {
-    return async message => {
-        try {
-            const server = serverSet.getServerById(message.guild.id);
+async function handleMessage(message, serverSet, identities, restart) {
+    try {
+        const server = serverSet.getServerById(message.guild.id);
 
-            if (message.author.bot) {
-                // Ignore bot messages, especially our own. We don't expect our
-                // messages to, like, start with shortcodes or anything... but it
-                // removes a class of bug and reduces log noise!
-                return;
-            } else if (server.isMirrorServer) {
-                try {
-                    await handleMessageFromMirrorServer(
-                        message,
-                        serverSet,
-                        identities,
-                        restart
-                    );
-                } catch (e) {
-                    // Notify the user of the error, then bubble up to the
-                    // main error handler. (We only do this for the mirror
-                    // server, to avoid disrupting people on the source
-                    // server!)
-                    message.reply("⛔️ " + e);
-                    throw e;
-                }
-            } else if (server.isSourceServer) {
-                await handleMessageFromSourceServer(message, serverSet);
-            } else {
-                console.warn(
-                    `⚠️  Received message from unexpected server ${
-                        message.guild.name
-                    }.`
+        if (message.author.bot) {
+            // Ignore bot messages, especially our own. We don't expect our
+            // messages to, like, start with shortcodes or anything... but it
+            // removes a class of bug and reduces log noise!
+            return;
+        } else if (server.isMirrorServer) {
+            try {
+                await handleMessageFromMirrorServer(
+                    message,
+                    serverSet,
+                    identities,
+                    restart
                 );
+            } catch (e) {
+                // Notify the user of the error, then bubble up to the
+                // main error handler. (We only do this for the mirror
+                // server, to avoid disrupting people on the source
+                // server!)
+                message.reply("⛔️ " + e);
+                throw e;
             }
-        } catch (e) {
-            console.error(`⛔️  Error handling message.`, e);
+        } else if (server.isSourceServer) {
+            await handleMessageFromSourceServer(message, serverSet);
+        } else {
+            console.warn(
+                `⚠️  Received message from unexpected server ${
+                    message.guild.name
+                }.`
+            );
         }
-    };
+    } catch (e) {
+        console.error(`⛔️  Error handling message.`, e);
+    }
 }
 
 async function handleMessageFromMirrorServer(
@@ -127,4 +125,4 @@ function parseMessageContentFromMirrorServer(content, identities) {
     return { body, identity };
 }
 
-module.exports = buildMessageHandler;
+module.exports = handleMessage;
