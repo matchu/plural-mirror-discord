@@ -1,0 +1,18 @@
+{
+    "name": "plural-mirror-discord",
+    "version": "1.0.0",
+    "main": "index.js",
+    "author": "Matchu",
+    "license": "MIT",
+    "private": true,
+    "scripts": {
+        "start": "node -r dotenv/config index.js"
+    },
+    "dependencies": {
+        "discord.js": "^11.4.2",
+        "dotenv": "^7.0.0"
+    },
+    "devDependencies": {
+        "prettier": "1.17.0"
+    }
+}
