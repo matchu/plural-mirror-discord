@@ -1,5 +1,16 @@
-const clientToken = process.env["pm.discord_client_token"];
-const mirrorServerId = process.env["pm.mirror_server_id"];
+function getEnv(key) {
+    if (!(key in process.env)) {
+        console.error(
+            `⛔️  Missing required environment variable "${key}". Aborting!`
+        );
+        process.exit(1);
+    }
+
+    return process.env[key];
+}
+
+const clientToken = getEnv("pm.discord_client_token");
+const mirrorServerId = getEnv("pm.mirror_server_id");
 
 const sourceServerShortcodes = Object.keys(process.env)
     .map(e => e.match(/^pm\.source_servers\.(.+?)\.server_id/))
@@ -8,7 +19,7 @@ const sourceServerShortcodes = Object.keys(process.env)
 
 const sourceServerConfigs = sourceServerShortcodes.map(shortcode => ({
     shortcode,
-    serverId: process.env[`pm.source_servers.${shortcode}.server_id`],
+    serverId: getEnv(`pm.source_servers.${shortcode}.server_id`),
 }));
 
 const identityShortcodes = Object.keys(process.env)
@@ -18,8 +29,8 @@ const identityShortcodes = Object.keys(process.env)
 
 const identities = identityShortcodes.map(shortcode => ({
     shortcode,
-    name: process.env[`pm.identities.${shortcode}.name`],
-    avatarUrl: process.env[`pm.identities.${shortcode}.avatar_url`],
+    name: getEnv(`pm.identities.${shortcode}.name`),
+    avatarUrl: getEnv(`pm.identities.${shortcode}.avatar_url`),
 }));
 
 module.exports = {
