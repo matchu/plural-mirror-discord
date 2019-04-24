@@ -9,28 +9,28 @@ function getEnv(key) {
     return process.env[key];
 }
 
-const clientToken = getEnv("pm.discord_client_token");
-const mirrorServerId = getEnv("pm.mirror_server_id");
+const clientToken = getEnv("DISCORD_CLIENT_TOKEN");
+const mirrorServerId = getEnv("MIRROR_SERVER_ID");
 
 const sourceServerShortcodes = Object.keys(process.env)
-    .map(e => e.match(/^pm\.source_servers\.(.+?)\.server_id/))
+    .map(e => e.match(/^SOURCE_SERVERS__(.+?)__SERVER_ID/))
     .filter(m => m)
     .map(m => m[1]);
 
 const sourceServerConfigs = sourceServerShortcodes.map(shortcode => ({
     shortcode,
-    serverId: getEnv(`pm.source_servers.${shortcode}.server_id`),
+    serverId: getEnv(`SOURCE_SERVERS__${shortcode}__SERVER_ID`),
 }));
 
 const identityShortcodes = Object.keys(process.env)
-    .map(e => e.match(/^pm\.identities\.(.+?)\.name/))
+    .map(e => e.match(/^IDENTITIES__(.+?)__NAME/))
     .filter(m => m)
     .map(m => m[1]);
 
 const identities = identityShortcodes.map(shortcode => ({
     shortcode,
-    name: getEnv(`pm.identities.${shortcode}.name`),
-    avatarUrl: getEnv(`pm.identities.${shortcode}.avatar_url`),
+    name: getEnv(`IDENTITIES__${shortcode}__NAME`),
+    avatarUrl: getEnv(`IDENTITIES__${shortcode}__AVATAR_URL`),
 }));
 
 module.exports = {
