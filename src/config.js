@@ -1,4 +1,5 @@
 const clientToken = process.env["pm.discord_client_token"];
+const mirrorServerId = process.env["pm.mirror_server_id"];
 
 const sourceServerShortcodes = Object.keys(process.env)
     .map(e => e.match(/^pm\.source_servers\.(.+?)\.server_id/))
@@ -10,4 +11,19 @@ const sourceServerConfigs = sourceServerShortcodes.map(shortcode => ({
     serverId: process.env[`pm.source_servers.${shortcode}.server_id`],
 }));
 
-module.exports = { clientToken, sourceServerConfigs };
+const identityShortcodes = Object.keys(process.env)
+    .map(e => e.match(/^pm\.identities\.(.+?)\.name/))
+    .filter(m => m)
+    .map(m => m[1]);
+
+const identities = identityShortcodes.map(shortcode => ({
+    shortcode,
+    name: process.env[`pm.identities.${shortcode}.name`],
+}));
+
+module.exports = {
+    clientToken,
+    mirrorServerId,
+    sourceServerConfigs,
+    identities,
+};

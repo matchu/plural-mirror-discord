@@ -6,13 +6,15 @@
     "license": "MIT",
     "private": true,
     "scripts": {
-        "start": "node -r dotenv/config src/index.js"
+        "start": "node -r dotenv/config src/index.js",
+        "watch": "nodemon --exec yarn start"
     },
     "dependencies": {
         "discord.js": "^11.4.2",
         "dotenv": "^7.0.0"
     },
     "devDependencies": {
+        "nodemon": "^1.18.11",
         "prettier": "1.17.0"
     }
 }

@@ -1,4 +1,15 @@
-function initializeServers(client, sourceServerConfigs) {
+function connectToMirrorServer(client, mirrorServerId) {
+    const guild = client.guilds.get(mirrorServerId);
+    if (!guild) {
+        return null;
+    }
+
+    return { guild, isMirrorServer: true };
+}
+
+function initializeServers(client, mirrorServerId, sourceServerConfigs) {
+    const mirrorServer = connectToMirrorServer(client, mirrorServerId);
+
     const sourceServers = [];
     const missingSourceServers = [];
 
@@ -15,10 +26,10 @@ function initializeServers(client, sourceServerConfigs) {
             continue;
         }
 
-        sourceServers.push({ shortcode, guild });
+        sourceServers.push({ shortcode, guild, isSourceServer: true });
     }
 
-    return { sourceServers, missingSourceServers };
+    return { mirrorServer, sourceServers, missingSourceServers };
 }
 
 module.exports = initializeServers;

@@ -1,7 +1,13 @@
 const Discord = require("discord.js");
 
-const { clientToken, sourceServerConfigs } = require("./config");
+const {
+    clientToken,
+    mirrorServerId,
+    sourceServerConfigs,
+    identities,
+} = require("./config");
 const initializeServers = require("./initialize-servers");
+const buildMessageHandler = require("./handle-message");
 
 const client = new Discord.Client();
 
@@ -14,14 +20,28 @@ client.on("ready", () => {
         "&permissions=536874048&scope=bot";
     console.log(`💌  Invite: ${inviteUrl}`);
 
-    const { sourceServers, missingSourceServers } = initializeServers(
-        client,
-        sourceServerConfigs
-    );
+    const {
+        mirrorServer,
+        sourceServers,
+        missingSourceServers,
+    } = initializeServers(client, mirrorServerId, sourceServerConfigs);
+
+    if (mirrorServer) {
+        console.log(
+            `🌻  Listening to mirror server: ${mirrorServer.guild.name}.`
+        );
+    } else {
+        console.error(
+            `⛔️  We can't access the mirror server (${mirrorServerId})! ` +
+                `PluralMirror won't be able to perform any of its actual ` +
+                `mirroring functionality. Please make sure you've invited ` +
+                `the bot! (This could also be a network outage? 🤔)`
+        );
+    }
 
     for (const { shortcode, guild } of sourceServers) {
         console.log(
-            `🎧  Listening to source server "${shortcode}" (${guild.name}).`
+            `🎧  Listening to source server: ${guild.name} [${shortcode}].`
         );
     }
     for (const { shortcode, serverId } of missingSourceServers) {
@@ -35,12 +55,11 @@ client.on("ready", () => {
     }
 
     console.log("💞  hii I love you! 😍");
-});
 
-client.on("message", msg => {
-    if (msg.content === "ping") {
-        msg.reply("Pong!");
-    }
+    client.on(
+        "message",
+        buildMessageHandler(client, mirrorServer, sourceServers, identities)
+    );
 });
 
 client.login(clientToken);
