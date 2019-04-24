@@ -47,6 +47,12 @@ async function handleMessageFromMirrorServer(
     identities,
     restart
 ) {
+    if (message.content === "ping") {
+        console.log("⭐️  Ping!");
+        message.reply("Pong! 💖");
+        return;
+    }
+
     if (message.content === "restart") {
         console.log("❗️  Restarting!");
         await message.reply("❗️  Restarting!");
