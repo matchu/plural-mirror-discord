@@ -2,23 +2,33 @@
 //       since it's public-facing-ish. This should probably be configured!
 const WEBHOOK_NAME = "MoreMatchus Message Proxy";
 
+/**
+ * Send a message with a custom author! The key to the whole bot :)
+ *
+ * We hack out this feature using webhooks, which, unlike normal bot messages,
+ * enable you to specify a custom username & avatar every time you send it a
+ * message.
+ *
+ * First, we ensure that this channel has our custom webhook installed,
+ * creating it if not. Then, we send a message to that webhook.
+ */
 async function sendMessageWithCustomAuthor(
     content,
     channelToSendTo,
     customAuthor
 ) {
-    // Webhooks are the key to this whole bot! Normally, your bot speaks with
-    // its fixed name and avatar - but webhook messages can be configured to
-    // show arbitrary names, avatars, etc. :)
-    const webhook = await connectToWebhook(channelToSendTo);
+    const webhook = await findOrCreateWebhook(channelToSendTo);
     webhook.send(content, {
         username: customAuthor.username,
         avatarURL: customAuthor.avatarURL,
     });
 }
 
-async function connectToWebhook(channel) {
-    // First, look for an existing webhook.
+/**
+ * Find our custom webhook for this channel, or create it if it doesn't exist.
+ */
+async function findOrCreateWebhook(channel) {
+    // First, look for an existing webhook, and return it if it exists.
     // TODO: This adds an extra net round-trip, we should probably cache this?
     const allExistingWebhooks = await channel.fetchWebhooks();
     const existingWebhook = allExistingWebhooks.find(
