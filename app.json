@@ -35,11 +35,11 @@
   "formation": {
     "worker": {
       "quantity": 1,
-      "size": "hobby"
+      "size": "free"
     },
     "web": {
       "quantity": 1,
-      "size": "hobby"
+      "size": "free"
     }
   }
 }
