@@ -87,11 +87,11 @@ Then, click "Deploy app", and Heroku should get your bot up and running!! 😁 O
 
 ### 5. Invite your bot to your servers
 
-On your Heroku app dashboard, click "More", then "View logs". You should see an error message near the bottom of the logs, because the bot isn't invited to your servers yet. But you should also see two invite links near the top of the logs, labeled "Invite to mirror server", and "Invite to source server". (If you don't see these messages, they might have expired from the logs. Try restarting the worker dyno, by using the "Resources" page to disable it, save, then re-enable it, and save again.)
+On your Heroku app dashboard, click "More", then "View logs". You should see an error message near the bottom of the logs, because the bot isn't invited to your servers yet. But you should also see two invite links near the top of the logs, labeled "💌  Invite to mirror server", and "💌  Invite to source server". (If you don't see these messages, they might have expired from the logs. Try restarting the worker dyno, by using the "Resources" page to disable it, save, then re-enable it, and save again.)
 
-Open the "Invite to mirror server" link, then choose your mirror server from the dropdown. Review the requested permissions, and finish adding the bot.
+Open the "💌  Invite to mirror server" link, then choose your mirror server from the dropdown. Review the requested permissions, and finish adding the bot.
 
-Then, open the "Invite to mirror server" link, then choose your source server from the dropdown. Review the requested permissions, and finish adding the bot. (If you don't have permission to add bots to your source server, send the link to a server admin, and ask them to help. If you have multiple source servers, repeat this step for each of them.)
+Then, open the "💌  Invite to source server" link, then choose your source server from the dropdown. Review the requested permissions, and finish adding the bot. (If you don't have permission to add bots to your source server, send the link to a server admin, and ask them to help. If you have multiple source servers, repeat this step for each of them.)
 
 Once you've done this, restart the worker dyno, by using the "Resources" page to disable it, save, then re-enable it, and save again. Now, in the logs, you should see messages that say "🌻  Listening to mirror server", and "🎧  Listening to source server", with the correct server names next to each. Hooray!
 
