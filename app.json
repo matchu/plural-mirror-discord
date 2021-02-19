@@ -31,5 +31,11 @@
       "description": "The URL for the avatar of the second \"identity\" (i.e. probably a headmate!) you're setting up. Consider uploading to a free image host! NOTE: This will require you to type \"p2\" to speak as this headmate, but you can use a different prefix code instead by renaming this variable later. You can add more identities by creating more variables, following this same naming pattern.",
       "required": false
     }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "hobby"
+    }
   }
 }
