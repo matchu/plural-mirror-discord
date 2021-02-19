@@ -12,19 +12,24 @@
       "required": true
     },
     "SOURCE_SERVERS__s1__SERVER_ID": {
-      "description": "The Discord \"source server\"'s ID. Find this by right-clicking the server name, with Developer Mode enabled. NOTE: This will prefix channel names with \"s1\", but you can use a different prefix code instead by renaming this variable."
+      "description": "The Discord \"source server\"'s ID. Find this by right-clicking the server name, with Developer Mode enabled. NOTE: This will prefix channel names with \"s1\", but you can use a different prefix code instead by renaming this variable later.",
+      "required": false
     },
     "IDENTITIES__p1__NAME": {
-      "description": "The name of the first \"identity\" (i.e. probably a headmate!) you're setting up. NOTE: This will require you to type \"p1\" to speak as this headmate, but you can use a different prefix code instead by renaming this varaible. You can add more identities by creating more variables, following this same naming pattern."
+      "description": "The name of the first \"identity\" (i.e. probably a headmate!) you're setting up. NOTE: This will require you to type \"p1\" to speak as this headmate, but you can use a different prefix code instead by renaming this variable later. You can add more identities by creating more variables, following this same naming pattern.",
+      "required": false
     },
     "IDENTITIES__p1__AVATAR_URL": {
-      "description": "The URL for the avatar of the first \"identity\" (i.e. probably a headmate!) you're setting up. Consider uploading to a free image host! NOTE: This will require you to type \"p1\" to speak as this headmate, but you can use a different prefix code instead by renaming this varaible. You can add more identities by creating more variables, following this same naming pattern."
+      "description": "The URL for the avatar of the first \"identity\" (i.e. probably a headmate!) you're setting up. Consider uploading to a free image host! NOTE: This will require you to type \"p1\" to speak as this headmate, but you can use a different prefix code instead by renaming this variable later. You can add more identities by creating more variables, following this same naming pattern.",
+      "required": false
     },
     "IDENTITIES__p2__NAME": {
-      "description": "The name of the second \"identity\" (i.e. probably a headmate!) you're setting up. NOTE: This will require you to type \"p2\" to speak as this headmate, but you can use a different prefix code instead by renaming this varaible. You can add more identities by creating more variables, following this same naming pattern."
+      "description": "The name of the second \"identity\" (i.e. probably a headmate!) you're setting up. NOTE: This will require you to type \"p2\" to speak as this headmate, but you can use a different prefix code instead by renaming this variable later. You can add more identities by creating more variables, following this same naming pattern.",
+      "required": false
     },
     "IDENTITIES__p2__AVATAR_URL": {
-      "description": "The URL for the avatar of the second \"identity\" (i.e. probably a headmate!) you're setting up. Consider uploading to a free image host! NOTE: This will require you to type \"p2\" to speak as this headmate, but you can use a different prefix code instead by renaming this varaible. You can add more identities by creating more variables, following this same naming pattern."
+      "description": "The URL for the avatar of the second \"identity\" (i.e. probably a headmate!) you're setting up. Consider uploading to a free image host! NOTE: This will require you to type \"p2\" to speak as this headmate, but you can use a different prefix code instead by renaming this variable later. You can add more identities by creating more variables, following this same naming pattern.",
+      "required": false
     }
   }
 }
