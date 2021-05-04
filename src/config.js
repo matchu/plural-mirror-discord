@@ -43,7 +43,7 @@
  * you can type "e Hello!" in a mirror channel, it will send a message as
  * identity "e".
  */
-
+require("dotenv").config();
 /** Get an environment variable, or abort if it's missing. */
 function getEnv(key) {
     if (!(key in process.env)) {
